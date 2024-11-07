@@ -1,7 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState} from 'react';
+// @ts-ignore
 import Modal from 'react-modal';
-import './style.css';
-import RoCrateSingleton from './roCrateSingleton'
+// import './style.css';
+// @ts-expect-error
+import RoCrateSingleton from "../utils/roCrateSingleton";
 
 Modal.setAppElement('#root');
 
@@ -30,18 +32,17 @@ type ModalProps = {
     useButtonVariant?: boolean;
 };
 
-const ROCrateBrowser: React.FC<ModalProps> = ({
-                                                  crateUrl,
-                                                  specificCrateFolder,
-                                                  useButtonVariant,
-                                              }) => {
+export const RoCrateBrowser: React.FC<ModalProps> = ({
+                                                         crateUrl,
+                                                         useButtonVariant,
+                                                     }) => {
     const [cratePreview, setCratePreview] = useState('');
     const [crateModalOpen, setCrateModalOpen] = useState(false);
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
     function handleButtonClick() {
         RoCrateSingleton.getHtmlContent('ro-crate-preview.html', crateUrl).then(
-            (previewHtml) => {
+            (previewHtml: React.SetStateAction<string>) => {
                 setCratePreview(previewHtml);
                 setCrateModalOpen(true);
             }
@@ -60,7 +61,7 @@ const ROCrateBrowser: React.FC<ModalProps> = ({
             return;
         }
         RoCrateSingleton.getHtmlContent(event.data, crateUrl).then(
-            (htmlContent) => {
+            (htmlContent: string) => {
                 if (iframeRef.current) {
                     iframeRef.current.srcdoc = htmlContent;
                 }
@@ -86,11 +87,11 @@ const ROCrateBrowser: React.FC<ModalProps> = ({
       </span>
             <Modal
                 isOpen={crateModalOpen}
+                style={modalStyle}
                 onRequestClose={() => {
                     window.removeEventListener('message', handleIframeMessage);
                     setCrateModalOpen(false);
                 }}
-                style={modalStyle}
                 onAfterOpen={() => {
                     window.addEventListener('message', handleIframeMessage);
                 }}
@@ -105,7 +106,7 @@ const ROCrateBrowser: React.FC<ModalProps> = ({
                         className="modal-close-button vf-button vf-button--link"
                         type="button"
                     >
-                        <i className="icon icon-common icon-times" />
+                        <i className="icon icon-common icon-times"/>
                     </button>
                 </div>
                 <iframe
@@ -120,4 +121,3 @@ const ROCrateBrowser: React.FC<ModalProps> = ({
     );
 };
 
-export default ROCrateBrowser;
